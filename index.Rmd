@@ -35,7 +35,7 @@ registerS3method('knit_print', 'flextable', knit_print.flextable)
 
 ::: {.col style='width:300px'}
 
-### Atusy
+### ***Atusy***
 
 ![](https://github.com/atusy/presentation/blob/master/headphone.jpg?raw=true){width=300px}
 
@@ -153,9 +153,8 @@ tibble::tibble(酸化物 = c('SiO2', 'Al2O3'),
 前準備
 
 ```{r grouped-iris}
-grouped_iris <- iris %>%
-  dplyr::group_by(Species) %>%
-  dplyr::slice(1:2)
+grouped_iris <- iris[c(1:2, 51:52), 3:5] %>%
+  dplyr::group_by(Species)
 ```
 
 ## グループをタイトル化
@@ -181,7 +180,7 @@ ftExtra::as_flextable(
 できるだけtidyverseを使いたいところ
 
 ```{r ft-group-to-title}
-iris[c(1,2,51,52,101,102), ] %>%
+iris[c(1:2, 51:52), 3:5] %>%
   flextable::as_grouped_data('Species') %>%
   flextable::as_flextable()
 ```
@@ -189,12 +188,12 @@ iris[c(1,2,51,52,101,102), ] %>%
 ## flextableでグループを結合
 
 ```{r ft-group-to-merged}
-iris[c(1,2,51,52,101,102), ] %>%
+iris[c(1:2, 51:52), 3:5] %>%
   dplyr::select(Species, everything()) %>%
   flextable::as_flextable() %>%
   flextable::merge_v('Species') %>%
-  flextable::theme_vanilla() %>% # テーマの再設定やら
-  flextable::fix_border_issues() # 枠線の修復やらめんどい
+  flextable::theme_vanilla() %>% # テーマの再設定
+  flextable::fix_border_issues() # 枠線の修復
 ```
 
 # ftExtraで見出しを階層化 {#multi-index}
