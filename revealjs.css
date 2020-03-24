@@ -1,0 +1,45 @@
+/* 全体の基準となるフォントサイズを大きくする */
+.reveal {
+  font-size: 40px
+}
+
+/* テーマが見出しを大文字化するのを防ぐ */
+.reveal h1, .reveal h2, .reveal h3 {
+  text-transform: none;
+}
+
+/* ソースコードのフォントサイズを大きくする */
+.reveal pre {
+  font-size: 0.9em
+}
+
+/* ソースコードの余白を調整する */
+/* preとdivで余白を指定しているのでdivの余白を消す */
+.reveal div.sourceCode {
+  margin: 0;
+}
+
+/* 画像の枠と影を消す */
+.reveal section img {
+  border: none;
+  box-shadow: none;
+}
+
+/* HTMLウィジェットを中央揃えにする */
+.reveal div.html-widget {
+  margin: 0 auto;
+}
+
+.reveal div.slides {
+  border: 1px solid black;
+}
+
+.reveal ul ul, .reveal ul ol, .reveal ol ol, .reveal ol ul{
+  margin-left: 2em;
+}
+
+.reveal .slides section .col {
+  display: inline-block;
+  width: 400px;
+  vertical-align: top;
+}

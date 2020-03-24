@@ -1,0 +1,248 @@
+---
+title: "ftExtraでもっとflextable"
+author: Atusy
+output:
+  revealjs::revealjs_presentation:
+    keep_md: true
+    self_contained: false
+    center: true
+    css: revealjs.css
+---
+
+```{r setup, include=FALSE}
+`%>%` <- magrittr::`%>%`
+```
+
+
+```{r knitr, include=FALSE}
+library(knitr)
+library(flextable)
+opts_knit$set(cache = TRUE)
+knit_print
+knit_print.flextable <- function(x, ...) {
+  x %>%
+    flextable::fontsize(size = 24, part = 'header') %>%
+    flextable::fontsize(size = 24, part = 'body') %>%
+    flextable::autofit(add_w = .4) %>%
+    flextable::htmltools_value() %>%
+    htmltools::div(style = 'margin: 1rem auto;') %>%
+    knitr::knit_print()
+}
+registerS3method('knit_print', 'flextable', knit_print.flextable)
+```
+# {#self-intro}
+
+
+::: {.col style='width:300px'}
+
+### Atusy
+
+![](https://github.com/atusy/presentation/blob/master/headphone.jpg?raw=true){width=300px}
+
+:::
+
+::: {.col style='width:600px'}
+
+* R Markdown関係のコミッタ
+    * RStudio PBCの公募に応募→面接落ち
+* 去年はfelpパッケージのLTした
+    * 後にCRANに登録
+* データサイエンティスト \
+  \@ HACARUS Inc.
+
+:::
+
+# ![](osakar_600_600.png){height=300px}
+
+わさびさんやくろきちさんと、 \
+定期的なもくもく会あたりから始めます
+
+# R Markdownにおける表組み
+
+Word/パワポで凝った表組みするなら \
+`flextable`パッケージが唯一の選択肢 \
+ただし使いやすくはない
+
+↓
+
+つ `install.packages('ftExtra')`{.r}
+
+## パッケージ比較
+
+```{r comparison, echo=FALSE, results='asis'}
+tibble::tribble(
+  ~ Package, ~ HTML, ~ PDF, ~ Docx, ~ Pptx,
+  'knitr',      'o',   'o',    'o',    'o',
+  'xtable',     'o',   'o',    'x',    'x',
+  'rstudio/gt', 'o',   'o',    'x',    'x',
+  'flextable',  'o',   'x',    'o',    'o',
+) %>%
+  flextable::flextable() %>%
+  flextable::theme_zebra() %>%
+  flextable::autofit()
+```
+
+- 画像化を許せば`x`は消える
+- HTML向けにばformattable, reactable, DTなども
+
+## knitr::kable()
+
+- デファクトスタンダード
+- 書式はフォーマット依存
+    - HTMLならCSS・PDFならLaTeX・Wordならスタイルなど、
+      出力に合わせて学ぶことが増える
+- セル結合などはできない
+    - HTML/PDF限定なら`kableExtra`パッケージがある
+- 全角文字の右寄せにバグあり
+
+## xtable・rstudio/gt
+
+- HTML・PDFにしか使えない
+- `rstudio/gt`は使いやすいがCRANに来る気配がない
+
+## flextable {#about-flextable}
+
+- Docx・Pptxで凝ったことやるなら唯一の選択肢
+- 最近bookdownで相互参照できるようにした
+- flex過ぎて使い辛い
+
+# ftExtraで文字修飾 {#colformat-md}
+
+マークダウン♡
+
+```{r colformat-md}
+tibble::tibble(
+  x = '***ft^Extra^***', y = 'is *Cool*'
+) %>%
+  ftExtra::as_flextable() %>%
+  ftExtra::colformat_md()
+```
+
+
+## flextableで文字修飾 {#without-colformat-md}
+
+
+```{r ft-format-strings, attr.source='style=font-size:0.8em'}
+tibble::tibble(x = 'ftExtra', y = 'is Cool') %>%
+  flextable::flextable() %>%
+  flextable::compose(
+    1, 'x',
+    flextable::as_paragraph(
+      'ft', flextable::as_sup('Extra')
+    )
+  ) %>%
+  flextable::bold(1, 'x') %>%
+  flextable::italic(j = c('x', 'y'))
+```
+
+## stringrとの組み合わせが便利！
+
+```{r minerals}
+tibble::tibble(酸化物 = c('SiO2', 'Al2O3'), 
+               紅柱石 = c(37.08, 69.92)) %>%
+  dplyr::mutate_at(
+    '酸化物', stringr::str_replace_all,
+    '([:number:]+)', '~\\1~'
+  ) %>%
+  ftExtra::as_flextable() %>%
+  ftExtra::colformat_md()
+```
+
+# ftExtraで行をグルーピング {#groupby}
+
+前準備
+
+```{r grouped-iris}
+grouped_iris <- iris %>%
+  dplyr::group_by(Species) %>%
+  dplyr::slice(1:2)
+```
+
+## グループをタイトル化
+
+```{r groups-to-title}
+ftExtra::as_flextable(
+  grouped_iris
+  # "Species: " を消すには hide_grouplabel = TRUE
+)
+```
+
+
+## グループのセルを結合
+
+```{r groups-to-merged}
+ftExtra::as_flextable(
+  grouped_iris, groups_to = 'merged'
+)
+```
+
+## flextableでグループをタイトル化 {#groups-to-title-by-ft}
+
+できるだけtidyverseを使いたいところ
+
+```{r ft-group-to-title}
+iris[c(1,2,51,52,101,102), ] %>%
+  flextable::as_grouped_data('Species') %>%
+  flextable::as_flextable()
+```
+
+## flextableでグループを結合
+
+```{r ft-group-to-merged}
+iris[c(1,2,51,52,101,102), ] %>%
+  dplyr::select(Species, everything()) %>%
+  flextable::as_flextable() %>%
+  flextable::merge_v('Species') %>%
+  flextable::theme_vanilla() %>% # テーマの再設定やら
+  flextable::fix_border_issues() # 枠線の修復やらめんどい
+```
+
+# ftExtraで見出しを階層化 {#multi-index}
+
+## 基本は`separate_header`
+
+```{r separate-header}
+iris[1:3, ] %>%
+  ftExtra::as_flextable() %>%
+  ftExtra::separate_header(sep = '\\.')
+```
+
+## 結合もするには`span_header`
+
+```{r span-header}
+iris[1:3, ] %>%
+  ftExtra::as_flextable() %>%
+  ftExtra::span_header(sep = '\\.')
+```
+
+## flextableで見出しを階層化 {#multiindex-with-ft}
+
+```{r ft-separate-header, warning=FALSE, attr.source='style=font-size:.65em;'}
+# 見出しの階層性を表現するデータフレームを容易
+header <- tibble::tibble(key = names(iris)) %>%
+  tidyr::separate('key', into = c('level1', 'level2'), remove = FALSE)
+
+flextable::flextable(iris[1:3, ]) %>%
+  flextable::set_header_df(
+    # 事前に準備した見出しをマッピング
+    mapping = header, key = 'key'
+  ) %>%
+  flextable::theme_booktabs() %>%
+  flextable::fix_border_issues()
+```
+
+# Future Works
+
+- マークダウン記法によるリンクや画像の挿入に対応
+- 操作手順によって表示が崩れる問題の修正
+
+and more?
+
+# Enjoy & Help Me!
+
+- Stars
+- Issues
+- PRs
+- GitHub Sponsors
+
+<https://github.com/atusy/ftExtra>
