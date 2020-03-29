@@ -1,5 +1,7 @@
 ---
 title: "ftExtraでもっとflextable"
+subtitle: "Tokyo.R 84"
+date: 2020-4-4
 author: Atusy
 output:
   revealjs::revealjs_presentation:
@@ -44,15 +46,17 @@ registerS3method('knit_print', 'flextable', knit_print.flextable)
 ::: {.col style='width:600px'}
 
 * R Markdown関係のコミッタ
-    * RStudio PBCの公募に応募→面接落ち
 * 去年はfelpパッケージのLTした
     * 後にCRANに登録
+* RStudio PBCを面接落ち
 * データサイエンティスト \
   \@ HACARUS Inc.
+* <https://blog.atusy.net>
+* <https://twitter.com/Atsushi776>w
 
 :::
 
-# ![](osakar_600_600.png){height=300px}
+# ![](osakar_600_600.png){height=500px}
 
 わさびさんやくろきちさんと、 \
 定期的なもくもく会あたりから始めます
@@ -78,7 +82,7 @@ tibble::tribble(
   'flextable',  'o',   'x',    'o',    'o',
 ) %>%
   flextable::flextable() %>%
-  flextable::theme_zebra() %>%
+  flextable::theme_booktabs() %>%
   flextable::autofit()
 ```
 
@@ -94,6 +98,7 @@ tibble::tribble(
 - セル結合などはできない
     - HTML/PDF限定なら`kableExtra`パッケージがある
 - 全角文字の右寄せにバグあり
+    - Pandoc由来
 
 ## xtable・rstudio/gt
 
@@ -153,7 +158,8 @@ tibble::tibble(酸化物 = c('SiO2', 'Al2O3'),
 前準備
 
 ```{r grouped-iris}
-grouped_iris <- iris[c(1:2, 51:52), 3:5] %>%
+grouped_iris <- 
+  iris[c(1:2, 51:52), 3:5] %>%
   dplyr::group_by(Species)
 ```
 
@@ -179,7 +185,7 @@ ftExtra::as_flextable(
 
 できるだけtidyverseを使いたいところ
 
-```{r ft-group-to-title}
+```{r ft-group-to-title, attr.source='style="font-size:0.8em"'}
 iris[c(1:2, 51:52), 3:5] %>%
   flextable::as_grouped_data('Species') %>%
   flextable::as_flextable()
@@ -196,7 +202,7 @@ iris[c(1:2, 51:52), 3:5] %>%
   flextable::fix_border_issues() # 枠線の修復
 ```
 
-# ftExtraで見出しを階層化 {#multi-index}
+# ftExtraでヘッダを階層化 {#multi-index}
 
 ## 基本は`separate_header`
 
@@ -216,7 +222,7 @@ iris[1:3, ] %>%
 
 ## flextableで見出しを階層化 {#multiindex-with-ft}
 
-```{r ft-separate-header, warning=FALSE, attr.source='style=font-size:.65em;'}
+```{r ft-separate-header, warning=FALSE, attr.source='style=font-size:.55em;'}
 # 見出しの階層性を表現するデータフレームを容易
 header <- tibble::tibble(key = names(iris)) %>%
   tidyr::separate('key', into = c('level1', 'level2'), remove = FALSE)
@@ -229,13 +235,6 @@ flextable::flextable(iris[1:3, ]) %>%
   flextable::theme_booktabs() %>%
   flextable::fix_border_issues()
 ```
-
-# Future Works
-
-- マークダウン記法によるリンクや画像の挿入に対応
-- 操作手順によって表示が崩れる問題の修正
-
-and more?
 
 # Enjoy & Help Me!
 
