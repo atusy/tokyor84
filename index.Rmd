@@ -21,11 +21,12 @@ library(knitr)
 library(flextable)
 opts_knit$set(cache = TRUE)
 knit_print
-knit_print.flextable <- function(x, ...) {
+knit_print.flextable <- function(x, options, ...) {
+  add_w = if (is.null(options$add_w)) .4 else options$add_w
   x %>%
     flextable::fontsize(size = 24, part = 'header') %>%
     flextable::fontsize(size = 24, part = 'body') %>%
-    flextable::autofit(add_w = .4) %>%
+    flextable::autofit(add_w = add_w) %>%
     flextable::htmltools_value() %>%
     htmltools::div(style = 'margin: 1rem auto;') %>%
     knitr::knit_print()
@@ -51,8 +52,10 @@ registerS3method('knit_print', 'flextable', knit_print.flextable)
 * RStudio PBCを面接落ち
 * データサイエンティスト \
   \@ HACARUS Inc.
-* <https://blog.atusy.net>
-* <https://twitter.com/Atsushi776>w
+* ![](https://icongr.am/feather/home.svg)
+  [blog.atusy.net](https://blog.atusy.net)
+* ![](https://icongr.am/feather/twitter.svg)
+  [\@Atsushi776](https://twitter.com/Atsushi776)
 
 :::
 
@@ -214,7 +217,7 @@ iris[1:3, ] %>%
 
 ## 結合もするには`span_header`
 
-```{r span-header}
+```{r span-header, add_w=1}
 iris[1:3, ] %>%
   ftExtra::as_flextable() %>%
   ftExtra::span_header(sep = '\\.')
@@ -241,6 +244,6 @@ flextable::flextable(iris[1:3, ]) %>%
 - Stars
 - Issues
 - PRs
-- GitHub Sponsors
+- Sponsors
 
 <https://github.com/atusy/ftExtra>
